@@ -5,14 +5,10 @@ Application for the input of volunteers for the company outreach projects.
 Program records transactions for each payment and saves to .csv file.
 A transaction id will also be recorded with the name and payment.
 """
-from random import randint
 
 # Store volunteer name and payment in dictionary format
 volunteer_dict = {}
-
-# Store random 3 digit number in a list
-random_number_list = []
-      
+        
 # This function will take a number as input, prompt the user for details
 # and return a dictionary with the names and payments for each volunteer
 def volunteer_register():
@@ -51,11 +47,4 @@ def volunteer_register():
                 print("Please enter a non-negative real number")            
 
 
-# Function to generate random digits
-def serial_gen():
-    digit = 3
-    range_start = 10**(digit - 1)
-    range_end = (10**digit)-1
-    random_number_list.append(randint(range_start, range_end))
-
-                   
+                           
