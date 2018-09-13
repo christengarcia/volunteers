@@ -6,9 +6,10 @@ Program records transactions for each payment and saves to .csv file.
 A transaction id will also be recorded with the name and payment.
 """
 from random import randint
+from operator import itemgetter
 
 # Store volunteer name and payment in dictionary format
-volunteer_dict = {}
+volunteers_dict = {}
 
 # Store transaction id in a list
 transaction_id = []
@@ -34,7 +35,7 @@ def volunteer_register():
         # Get name and check for alphabet input only then store in dictionary
         while True:
             name = input("Please enter a name: ")          
-            volunteer_dict.update({'name': name})
+            volunteers_dict.update({'name': name})
             if all(name.isalpha() or name.isspace() for name in name):                              
                 break
             else:
@@ -44,7 +45,7 @@ def volunteer_register():
         while True: 
             try:
                 payment = float(input("Please enter a payment amount: "))
-                volunteer_dict.update({'payment': payment})
+                volunteers_dict.update({'payment': payment})
                 assert(payment > 0), 'Payment must be greater than 0'               
                 break
             except:
@@ -57,5 +58,12 @@ def serial_gen():
     range_start = 10**(digit - 1)
     range_end = (10**digit)-1
     transaction_id.append(randint(range_start, range_end))
+
+
+# This function will take a list of key values from the volunteer
+# dictionary, sort them alphabetically and return a sorted list
+def sort_volunteers():
+    sorted(volunteers_dict, key=itemgetter('name'))
+
 
                   
