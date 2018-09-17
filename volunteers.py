@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Application for the input of volunteers for the company outreach projects.
-Program records transactions for each payment and saves to .csv file.
-A transaction id will also be recorded with the name and payment.
+Application for the input of volunteers for company outreach projects.
+Program assigns unique transaction id number for each payment then saves 
+details to .csv file in alphabetical order. Program will automatically 
+create a new record.csv file if non exists.
 """
 
 import os
 import csv
-import operator
 import pandas as pd
 from random import randint
 from collections import OrderedDict
@@ -48,13 +48,13 @@ def volunteer_register():
         # Get payment amount and check for non-negative real number then store in dictionary 
         while True: 
             try:
-                payment = float(input("Please enter a payment amount: "))
-                assert(payment > 0), 'Payment must be greater than 0'               
+                input_payment = float(input("Please enter a payment amount: "))
+                assert(input_payment > 0), 'Payment must be greater than 0'
+                payment = '${:.2f}'.format(input_payment)
                 break
             except:
                 print("Please enter a non-negative real number")  
-        
-        # Store serial number, name and payment data in dictionary format
+        # Add transaction id, name and payment data to dictionary
         transaction_id = serial_gen()
         volunteers[transaction_id] = name, payment
 
@@ -78,6 +78,7 @@ def serial_gen():
             reader = csv.reader(csv_file)
             for row in reader:
                 used_serials.append(row[0])
+                break
     else:
         return random_serial
     
@@ -88,26 +89,17 @@ def serial_gen():
         return random_serial
 
     
-# This function will take a list of key values from the volunteer
-# dictionary, sort them alphabetically and return a sorted list
-def sort_volunteers():
-    # Opens exisiting csv file in read only mode
-    read_csv = open(input_file, 'r')
-    csv1 = csv.reader(read_csv, delimiter=',')
-    
-    # Ignore reading header
-    header = next(csv1, None)
-    
-    # Sort Column B in csv file
-    sort = sorted(csv1, key=operator.itemgetter(1))
-    
-    # Overwrite existing csv file with sorted data
-    with open(input_file, 'w') as csv_file:
-        file_writer = csv.writer(csv_file, delimiter=',', 
-                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        if header:
-            file_writer.writerow(header)
-        file_writer.writerows(sort)
+# Read existing csv file and convert into list of tuples
+# Quicksort tuples alphabetically and overwrite csv file 
+def sort_volunteer(tuple_list):
+    l = len(tuple_list) 
+    for i in range(0, l): 
+        for j in range(0, l-i-1): 
+            if (tuple_list[j][1] > tuple_list[j + 1][1]): 
+                tempo = tuple_list[j] 
+                tuple_list[j]= tuple_list[j + 1] 
+                tuple_list[j + 1]= tempo 
+    return tuple_list 
         
 
 # Function calls volunteer_register, serial_gen and sort_volunteers
@@ -119,7 +111,7 @@ def output_csv():
     # Print out sorted input values
     alpha = OrderedDict(sorted(volunteers.items(), key=lambda x: x[1]))
     for key, value in alpha.items():
-        print("{},".format(key), "{},".format(value[0]), "${:.2f}".format(value[1]))
+        print("{},".format(key), "{},".format(value[0]), value[1])
     
     # Checks if csv file exists to record volunteer details 
     # if none exists a new csv file is created
@@ -128,7 +120,7 @@ def output_csv():
         print("Data recorded on new csv file")
         with open(input_file, 'a') as csv_file:
             file_writer = csv.writer(csv_file, delimiter=',', 
-                                     quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                       quotechar='|', quoting=csv.QUOTE_MINIMAL)
             file_writer.writerow(['Transaction_ID', 'Name', 'Payment'])               
     else:
         print('\n')
@@ -141,12 +133,29 @@ def output_csv():
     df = df.transpose()                                   
     df.to_csv(input_file, mode=mode, encoding='utf-8', header=False, sep=',',)
     
-    # Call sort_volunteers function to sort csv file in alphabetical order
-    sort_volunteers()
-        
+    # Read existing csv file and convert into tuple list
+    #with open(input_file, 'r') as f:
+    read_csv = open(input_file, 'r')
+    csv1 = csv.reader(read_csv, delimiter=',')
+    
+    # Ignore reading header
+    header = next(csv1, None)
+    create_tuple_list = [tuple(line) for line in csv.reader(read_csv)]
+
+    # Overwrite existing csv file with alphabetically sorted data
+    with open(input_file, 'w') as csv_file:
+        file_writer = csv.writer(csv_file, delimiter=',', 
+                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        if header:
+            file_writer.writerow(header)
+        new_sort = sort_volunteer(create_tuple_list)
+        file_writer.writerows(new_sort)
+
+          
 # main function    
 def main():
     output_csv()
+ 
     
 if __name__ =="__main__":
     main()
