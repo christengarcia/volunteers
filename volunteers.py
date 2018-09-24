@@ -18,8 +18,8 @@ input_file = 'record.csv'
 # Store transaction id, volunteer names and payments in dictionary format
 volunteers = {}
       
-# Function will get number of entries, prompt the user for details and
-# return a dictionary with the names and payments for each volunteer
+# Get number of entries, prompt the user for details and return  
+# a dictionary with the names and payments for each volunteer
 def volunteer_register():
     while True:
         try:
@@ -34,15 +34,17 @@ def volunteer_register():
             return volunteer_register()
             
     # For each item assign unique transaction id and get volunteers name and payment amount       
-    for i in range(num_volunteers):     
-        
-        # Get name and check for alphabet input only
-        while True: 
+    for i in range(num_volunteers):
+        while True:        
+            # Get name and check errors for alphabet input only and no blank entry
             name = input("Please enter a name: ")
-            if all(name.isalpha() or name.isspace() for name in name):                              
+            if (any(name.isalpha() for name in name)
+                and any(name.isspace() for name in name)
+                and all(name.isalpha() or name.isspace() for name in name)):
                 break
             else:
-                print("Please enter alphabet characters only")
+                print("Please enter a first name and surname")
+
                            
         # Get payment amount and check for non-negative real number 
         while True: 
@@ -61,8 +63,7 @@ def volunteer_register():
     print("\n")
         
 
-# Function to generate 3 digit transaction id then 
-# checks numbers in existing csv file for uniqueness
+# Generate 3 digit transaction id then check numbers in existing csv file for uniqueness
 def serial_gen():
     # Store used serial numbers in a list
     used_serials = []
@@ -91,8 +92,7 @@ def serial_gen():
         return random_serial_str
    
 
-# Function to Quicksort list of tuples and
-# return sorted names in alphabetical order
+# Quicksort list of tuples and return sorted names in alphabetical order
 def sort_volunteers(tuple_list):
     l = len(tuple_list) 
     for i in range(0, l): 
@@ -104,7 +104,7 @@ def sort_volunteers(tuple_list):
     return tuple_list 
         
 
-# Function calls volunteer_register, serial_gen and sort_volunteers
+# Call volunteer_register, serial_gen and sort_volunteers functions
 # Creates a csv file if none exists then records all volunteer details to file
 # Stored data passes through sort_volunteers function where it is alphabetically
 # sorted and then re-written on the same csv file    
@@ -112,10 +112,11 @@ def output_csv():
     volunteer_register() 
     serial_gen()
     
-    # Print out sorted input values
+    # Convert volunteers dictionary into a tuple
     tuple_list_1 = [tuple(line) for line in volunteers.items()]
     sort_volunteers(tuple_list_1)
     
+    # Print out sorted input values
     for key, value in tuple_list_1:
         print("{},".format(key), "{},".format(value[0]), value[1])
     
